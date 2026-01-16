@@ -50,9 +50,14 @@ from django.contrib import admin
 from django.urls import path, include
 from bookshelf.views import SignUpView, HomeView
 
+# urlpatterns = [
+#     path("", HomeView.as_view(), name="home"),   # 👈 THIS FIXES IT
+#     path("admin/", admin.site.urls),
+#     path("accounts/", include("django.contrib.auth.urls")),
+#     path("signup/", SignUpView.as_view(), name="signup"),
+# ]
+
 urlpatterns = [
-    path("", HomeView.as_view(), name="home"),   # 👈 THIS FIXES IT
     path("admin/", admin.site.urls),
-    path("accounts/", include("django.contrib.auth.urls")),
-    path("signup/", SignUpView.as_view(), name="signup"),
+    path("", include("relationship_app.urls")),
 ]
