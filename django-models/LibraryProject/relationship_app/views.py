@@ -5,6 +5,19 @@ from django.contrib.auth.decorators import permission_required
 
 # ===== Role check helpers =====
 
+def add_book(request):
+    pass
+
+def edit_book(request):
+    pass
+
+def delete_book(request):
+    pass
+
+
+
+
+
 def is_admin(user):
     return (
         user.is_authenticated and

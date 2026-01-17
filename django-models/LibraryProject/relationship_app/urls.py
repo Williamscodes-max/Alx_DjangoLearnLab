@@ -45,11 +45,9 @@
 
 from django.urls import path
 from . import views
-from django.urls import path, include
 
 urlpatterns = [
-    path('books/add/', views.add_book, name='add_book'),
-    path('books/edit/<int:book_id>/', views.edit_book, name='edit_book'),
-    path('books/delete/<int:book_id>/', views.delete_book, name='delete_book'),
-    path('', include('relationship_app.urls')),
+    path("add_book/", views.add_book, name="add_book"),
+    path("edit_book/", views.edit_book, name="edit_book"),
+    path("delete_book/", views.delete_book, name="delete_book"),
 ]
