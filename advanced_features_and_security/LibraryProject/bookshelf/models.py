@@ -9,7 +9,14 @@ class Book(models.Model):
 
     def __str__(self):
         return f"{self.title} by {self.author} ({self.publication_year})"
-    
+
+    class Meta:
+        permissions = [
+            ("can_view", "can view book"),
+            ("can_create", "can create book"),
+            ("can_edit", "can edit book"),
+            ("can_delete", "can delete book"),
+        ]
 
 # Custom User Manager
 class CustomUserManager(BaseUserManager):
