@@ -23,6 +23,14 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import permission_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Book
+from django.db.models import Q
+
+def book_search(request):
+    query = request.GET.get('q', '')
+    results = Book.objects.filter(
+        Q(title__icontains=query) | Q(author__icontains=query)
+    )
+    return render(request, 'bookshelf/book_list.html', {'books': results})
 
 
 @permission_required('bookshelf.can_create', raise_exception=True)

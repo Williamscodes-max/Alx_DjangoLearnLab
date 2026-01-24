@@ -23,7 +23,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v)$9sw6iseu-c!!a7ck5g8z1-s4^nr(5yl$=*&-qfe)j9n@!9r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+# XSS protection
+SECURE_BROWSER_XSS_FILTER = True
+
+# Prevent clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+# Prevent content type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Secure cookies
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+# Optionally, force HTTPS (if running on production)
+SECURE_SSL_REDIRECT = True  # redirect HTTP → HTTPS
 
 ALLOWED_HOSTS = []
 
@@ -44,6 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',  # if using django-csp
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -130,3 +147,18 @@ STATIC_URL = 'static/'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+
+
+
+
+# SECURITY MEASURES IMPLEMENTED
+# 1. DEBUG=False → hide detailed errors in production
+# 2. SECURE_BROWSER_XSS_FILTER=True → protect against XSS attacks
+# 3. X_FRAME_OPTIONS='DENY' → prevent clickjacking
+# 4. SECURE_CONTENT_TYPE_NOSNIFF=True → prevent MIME type sniffing
+# 5. CSRF_COOKIE_SECURE=True → CSRF cookies only over HTTPS
+# 6. SESSION_COOKIE_SECURE=True → session cookies only over HTTPS
+# 7. All forms use {% csrf_token %} to prevent CSRF attacks
+# 8. ORM queries used to prevent SQL injection
+
