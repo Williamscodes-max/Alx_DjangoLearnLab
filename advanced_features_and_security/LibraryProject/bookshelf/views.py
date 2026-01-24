@@ -58,9 +58,9 @@ def delete_book(request, pk):
 
 
 @permission_required('bookshelf.can_view', raise_exception=True)
-def books_list(request):
+def book_list(request):  # <-- rename here
     books = Book.objects.all()
-    return render(request, 'bookshelf/books_list.html', {'books': books})
+    return render(request, 'bookshelf/book_list.html', {'books': books})
 
 
 class SignUpView(CreateView):
