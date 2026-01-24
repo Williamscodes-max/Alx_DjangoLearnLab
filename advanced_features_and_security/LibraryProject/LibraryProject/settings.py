@@ -51,6 +51,10 @@ SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
+# Trust X-Forwarded-Proto header from proxy (required for HTTPS behind proxy)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 # Security headers
 X_FRAME_OPTIONS = 'DENY'               # Prevent clickjacking
 SECURE_CONTENT_TYPE_NOSNIFF = True     # Prevent content-type sniffing
