@@ -70,6 +70,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Content Security Policy
+CSP_DEFAULT_SRC = ("'self'",)  # Only allow content from your own domain
+CSP_STYLE_SRC = ("'self'", 'fonts.googleapis.com')  # Allow Google Fonts
+CSP_SCRIPT_SRC = ("'self'", 'ajax.googleapis.com')  # Allow scripts from your domain + Google Ajax
+
+
+
+
 AUTH_USER_MODEL = 'bookshelf.CustomUser'
 # AUTH_USER_MODEL = 'relationship_app.UserProfile'
 
