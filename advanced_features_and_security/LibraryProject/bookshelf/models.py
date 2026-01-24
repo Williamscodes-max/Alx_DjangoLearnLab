@@ -1,6 +1,20 @@
+# Custom permissions for ALX task:
+# can_view    → Allows users to view book list
+# can_create  → Allows users to add new books
+# can_edit    → Allows users to edit existing books
+# can_delete  → Allows users to delete books
+
+
+
+
+
+
+
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .managers import CustomUserManager
 
 class Book(models.Model):
     title = models.CharField(max_length=200)

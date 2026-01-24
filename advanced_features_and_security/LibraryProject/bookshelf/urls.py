@@ -17,9 +17,17 @@
 
 from django.urls import path
 from django.views.generic import TemplateView
+from . import views
+
+# urlpatterns = [
+#     path("", TemplateView.as_view(template_name="bookshelf/home.html"), name="home"),
+# ]
+
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="bookshelf/home.html"), name="home"),
+    path('books/', views.books_list, name='books_list'),
+    path('books/add/', views.create_book, name='create_book'),
+    path('books/<int:pk>/edit/', views.edit_book, name='edit_book'),
+    path('books/<int:pk>/delete/', views.delete_book, name='delete_book'),
 ]
-
 
