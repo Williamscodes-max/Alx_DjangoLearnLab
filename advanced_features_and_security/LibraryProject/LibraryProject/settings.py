@@ -45,6 +45,17 @@ ALLOWED_HOSTS = []
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # 1 year in seconds
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Security headers
+X_FRAME_OPTIONS = 'DENY'               # Prevent clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True     # Prevent content-type sniffing
+SECURE_BROWSER_XSS_FILTER = True       # Enable browser XSS filter
+
 # Application definition
 
 INSTALLED_APPS = [
