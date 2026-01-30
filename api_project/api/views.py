@@ -10,3 +10,12 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+# api/views.py
+from rest_framework import generics
+
+class BookList(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
