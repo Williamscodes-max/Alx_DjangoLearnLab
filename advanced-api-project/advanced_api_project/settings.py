@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',  # ✅ DRF
     'api',              # ✅ your app
     'django_filters',   # ✅ django-filter
+    'rest_framework.authtoken',
 ]
 
 REST_FRAMEWORK = {

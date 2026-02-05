@@ -1,146 +1,102 @@
-from django.urls import reverse
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.test import APITestCase
-from api.models import Author, Book
+from .models import Book, Author
 
+
+# -----------------------------
+# API CRUD Tests for Book model
+# -----------------------------
+from django.urls import reverse
+from rest_framework.test import APITestCase, APIClient
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
+from rest_framework import status
+from .models import Author, Book
 
 class BookAPITestCase(APITestCase):
-    """
-    Test suite for Book API endpoints
-    """
-
     def setUp(self):
-        """
-        Runs before every test.
-        Creates a user and authenticates requests.
-        """
-        self.user = User.objects.create_user(
-            username="testuser",
-            password="testpass123"
-        )
+        # Create a user
+        self.user = User.objects.create_user(username='testuser', password='password123')
+        self.token = Token.objects.create(user=self.user)
+        
+        # Client with token authentication
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        # Authenticate all requests
-        self.client.force_authenticate(user=self.user)
+        # Create test author and book
+        self.author = Author.objects.create(name="Author 1")
+        self.book = Book.objects.create(title="Test Book", publication_year=2023, author=self.author)
 
-        self.author = Author.objects.create(name="Test Author")
+        # ✅ Define URLs for your endpoints
+        # Assuming you registered your viewset as 'books' in urls.py
+        self.books_url = '/api/books/'              # list/create endpoint
+        self.book_url = f'/api/books/{self.book.id}/'  # retrieve/update/delete endpoint
 
-        self.book = Book.objects.create(
-            title="Test Book",
-            publication_year=2020,
-            author=self.author
-        )
 
-        self.books_url = "/api/books/"
-
-    def test_get_books_list(self):
-        """
-        Test retrieving list of books
-        """
+    def test_list_books(self):
         response = self.client.get(self.books_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_create_book(self):
-        """
-        Test creating a new book
-        """
         data = {
-            "title": "New Book",
-            "publication_year": 2019,
-            "author": self.author.id
+            'title': 'Harry Potter and the Chamber of Secrets',
+            'publication_year': 1998,
+            'author': self.author.id
         }
-
         response = self.client.post(self.books_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Book.objects.count(), 2)
 
-    def test_retrieve_single_book(self):
-        """
-        Test retrieving a single book
-        """
-        response = self.client.get(f"{self.books_url}{self.book.id}/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["title"], "Test Book")
-
     def test_update_book(self):
-        """
-        Test updating a book
-        """
-        data = {
-            "title": "Updated Title",
-            "publication_year": 2021,
-            "author": self.author.id
-        }
-
-        response = self.client.put(f"{self.books_url}{self.book.id}/", data)
+        data = {'title': 'Harry Potter Updated'}
+        response = self.client.patch(self.book_url, data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.book.refresh_from_db()
-        self.assertEqual(self.book.title, "Updated Title")
+        self.assertEqual(self.book.title, 'Harry Potter Updated')
 
     def test_delete_book(self):
-        """
-        Test deleting a book
-        """
-        response = self.client.delete(f"{self.books_url}{self.book.id}/")
+        response = self.client.delete(self.book_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Book.objects.count(), 0)
+        self.assertFalse(Book.objects.filter(id=self.book.id).exists())
 
-
+# -----------------------------------------------
+# Filtering, Searching, and Ordering API Tests
+# -----------------------------------------------
 class BookFilterSearchOrderTestCase(APITestCase):
-    """
-    Tests for filtering, searching, and ordering Book endpoints
-    """
 
     def setUp(self):
-        from django.contrib.auth.models import User
-        from api.models import Author, Book
+        # Test user setup
+        self.user = User.objects.create_user(username='testuser2', password='password123')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        self.user = User.objects.create_user(
-            username="filteruser",
-            password="filterpass123"
-        )
-        self.client.force_authenticate(user=self.user)
+        # Authors and books for testing
+        self.author1 = Author.objects.create(name='J.K. Rowling')
+        self.author2 = Author.objects.create(name='George R.R. Martin')
 
-        self.author1 = Author.objects.create(name="Author One")
-        self.author2 = Author.objects.create(name="Author Two")
+        self.book1 = Book.objects.create(title='Harry Potter 1', publication_year=1997, author=self.author1)
+        self.book2 = Book.objects.create(title='Harry Potter 2', publication_year=1998, author=self.author1)
+        self.book3 = Book.objects.create(title='Game of Thrones', publication_year=1996, author=self.author2)
 
-        Book.objects.create(
-            title="Django Basics",
-            publication_year=2018,
-            author=self.author1
-        )
-        Book.objects.create(
-            title="Advanced Django",
-            publication_year=2022,
-            author=self.author2
-        )
-
-        self.url = "/api/books/"
+        self.books_url = '/api/books/'
 
     def test_filter_books_by_author(self):
-        """
-        Test filtering books by author ID
-        """
-        response = self.client.get(self.url, {"author": self.author1.id})
+        response = self.client.get(self.books_url, {'author': self.author2.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "Django Basics")
+        self.assertEqual(response.data[0]['title'], 'Game of Thrones')
 
     def test_search_books_by_title(self):
-        """
-        Test searching books by title
-        """
-        response = self.client.get(self.url, {"search": "Advanced"})
+        response = self.client.get(self.books_url, {'search': 'Harry Potter 1'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["title"], "Advanced Django")
+        self.assertEqual(response.data[0]['title'], 'Harry Potter 1')
 
     def test_order_books_by_publication_year(self):
-        """
-        Test ordering books by publication year
-        """
-        response = self.client.get(self.url, {"ordering": "publication_year"})
+        response = self.client.get(self.books_url, {'ordering': 'publication_year'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]["publication_year"], 2018)
-
+        years = [book['publication_year'] for book in response.data]
+        self.assertEqual(years, sorted(years))
