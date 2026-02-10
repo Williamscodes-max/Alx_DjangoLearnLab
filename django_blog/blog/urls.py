@@ -15,10 +15,27 @@
 # ]
 
 
+# from django.urls import path
+# from . import views
+
+# urlpatterns = [
+#     path('', views.post_list, name='home'),
+#     path('post/<int:pk>/', views.post_detail, name='post_detail'),
+#     # path('login/', views.user_login, name='login'),    # your login view
+#     # path('logout/', views.user_logout, name='logout'), # your logout view
+#     path('post/<int:pk>/', views.post_detail, name='post_detail'),
+#     path('', views.post_list, name='post_list'),
+# ]
+
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
     path('', views.post_list, name='home'),
     path('post/<int:pk>/', views.post_detail, name='post_detail'),
+    path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
 ]
+
+
