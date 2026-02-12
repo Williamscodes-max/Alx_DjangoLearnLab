@@ -5,7 +5,7 @@
 
   {% for post in posts %}
     <h2>
-      <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+      <a href="{% url 'post-create' %}">Create New Post</a>
     </h2>
     <p>{{ post.content|truncatewords:30 }}</p>
   {% empty %}
