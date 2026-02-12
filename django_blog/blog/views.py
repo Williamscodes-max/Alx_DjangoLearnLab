@@ -13,12 +13,59 @@ from django.contrib import messages
 from .forms import UserRegisterForm, UserUpdateForm
 
 
+from .models import Comment
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.forms import UserChangeForm
+
+
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy
 from .models import Post
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        form.instance.post = post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+    
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+
+    
+
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+
+
+
 
 class PostListView(ListView):
     model = Post
@@ -29,8 +76,12 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'blog/post_detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = CommentForm()
+        return context
+    
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -91,17 +142,14 @@ def register(request):
 
 @login_required
 def profile(request):
-    if request.method == 'POST':
-        form = UserUpdateForm(request.POST, instance=request.user)
+    if request.method == "POST":
+        form = UserChangeForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated successfully!')
             return redirect('profile')
     else:
-        form = UserUpdateForm(instance=request.user)
-
+        form = UserChangeForm(instance=request.user)
     return render(request, 'blog/profile.html', {'form': form})
-
 
 
 
@@ -151,3 +199,5 @@ def post_detail(request, pk):
         'comments': comments,
         'form': form
     })
+
+
