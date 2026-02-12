@@ -82,3 +82,25 @@ templates/
 4. Access `/profile/`
 5. Log out at `/logout/`
 
+
+
+## Blog Post Management Features
+
+The blog supports full CRUD operations for posts.
+
+### Features
+- List all posts
+- View single post
+- Create posts (authenticated users)
+- Edit and delete posts (authors only)
+
+### Permissions
+- Only logged-in users can create posts
+- Only post authors can edit or delete posts
+
+### URLs
+- /posts/
+- /posts/new/
+- /posts/<id>/
+- /posts/<id>/edit/
+- /posts/<id>/delete/

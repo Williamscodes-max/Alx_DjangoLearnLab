@@ -1,4 +1,4 @@
-{% extends 'blog/base.html' %}
+<!-- {% extends 'blog/base.html' %}
 
 {% block content %}
   <h1>{{ post.title }}</h1>
@@ -25,4 +25,14 @@
   {% else %}
     <p>You must be logged in to comment.</p>
   {% endif %}
-{% endblock %}
+{% endblock %} -->
+
+
+<h1>{{ object.title }}</h1>
+<p>{{ object.content }}</p>
+<p>Author: {{ object.author }}</p>
+
+{% if user == object.author %}
+  <a href="{% url 'post-update' object.pk %}">Edit</a>
+  <a href="{% url 'post-delete' object.pk %}">Delete</a>
+{% endif %}
