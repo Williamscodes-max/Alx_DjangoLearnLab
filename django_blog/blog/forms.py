@@ -18,6 +18,10 @@ from .models import Post
 from .models import Post, Tag
 
 
+class TagWidget(forms.TextInput):
+    pass
+
+
 
 class PostForm(forms.ModelForm):
     tags = forms.CharField(
