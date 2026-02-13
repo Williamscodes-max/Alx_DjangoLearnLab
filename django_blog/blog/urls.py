@@ -36,4 +36,9 @@ urlpatterns = [
         views.CommentCreateView.as_view(),
         name='comment-create'
     ),
+
+     path('search/', views.search_posts, name='search'),
+
+    # tag filtering
+    path('tags/<str:tag_name>/', views.posts_by_tag, name='posts-by-tag'),
 ]

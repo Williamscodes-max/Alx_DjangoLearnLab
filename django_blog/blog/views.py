@@ -12,6 +12,9 @@ from django.contrib import messages
 # from django.contrib.auth.forms import AuthenticationForm
 from .forms import UserRegisterForm, UserUpdateForm
 
+from django.db.models import Q
+from .models import Post, Tag
+
 
 from .models import Comment
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -136,6 +139,16 @@ def register(request):
     return render(request, 'blog/register.html', {'form': form})
 
 
+def posts_by_tag(request, tag_name):
+    tag = Tag.objects.get(name=tag_name)
+    posts = tag.posts.all()
+
+    return render(request, 'blog/posts_by_tag.html', {
+        'tag': tag,
+        'posts': posts
+    })
+
+
 
 
 
@@ -199,6 +212,20 @@ def post_detail(request, pk):
         'post': post,
         'comments': comments,
         'form': form
+    })
+
+
+def search_posts(request):
+    query = request.GET.get('q', '')
+    posts = Post.objects.filter(
+        Q(title__icontains=query) |
+        Q(content__icontains=query) |
+        Q(tags__name__icontains=query)
+    ).distinct()
+
+    return render(request, 'blog/search_results.html', {
+        'posts': posts,
+        'query': query
     })
 
 
