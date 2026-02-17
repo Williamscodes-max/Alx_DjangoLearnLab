@@ -121,3 +121,9 @@ STATIC_URL = 'static/'
 
 # AUTH_USER_MODEL = 'accounts.User'
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
