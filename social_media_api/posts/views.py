@@ -1,17 +1,14 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from notifications.models import Notification
-
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -80,15 +77,14 @@ class LikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
 
-        if Like.objects.filter(user=request.user, post=post).exists():
+        if not created:
             return Response(
                 {"error": "You have already liked this post."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        Like.objects.create(user=request.user, post=post)
 
         # create notification for post author
         if post.author != request.user:
@@ -110,7 +106,7 @@ class UnlikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
         like = Like.objects.filter(user=request.user, post=post).first()
 
         if not like:
