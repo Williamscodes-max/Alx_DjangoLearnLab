@@ -1,0 +1,6 @@
+notepad Procfile
+```
+
+Paste this:
+```
+web: gunicorn social_media_api.wsgi --log-file -
